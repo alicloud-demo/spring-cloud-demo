@@ -1,0 +1,40 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: spring-cloud-demo
+spec:
+  type: git
+  params:
+  - name: url
+    value: https://github.com/alicloud-demo/spring-cloud-demo
+---
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: build-deploy-sae
+spec:
+  inputs:
+    resources:
+    - name: source
+      type: git
+  steps:
+  - name: build-and-deploy
+    image: maven:3.3-jdk-8
+    # mvn clean package toolkit:deploy -Dtoolkit_profile=toolkit_profile.yaml -Dtoolkit_package=toolkit_package.yaml -Dtoolkit_deploy=toolkit_deploy.yaml                           
+    command: ["mvn", "clean", "package", "-f", "source", "toolkit:deploy", "-Dtoolkit_profile=toolkit_profile.yaml", "-Dtoolkit_package=toolkit_package.yaml", "-Dtoolkit_deploy=toolkit_deploy.yaml"]
+    securityContext:
+      runAsUser: 0
+---
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  name: build-deploy-sae
+spec:
+  taskRef:
+    name: build-deploy-sae
+  inputs:
+    resources:
+    - name: source
+      resourceRef:
+        name: spring-cloud-demo
+

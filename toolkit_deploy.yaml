@@ -1,0 +1,6 @@
+apiVersion: V1
+kind: AppDeployment
+spec:
+ type: serverless
+ target:
+  appId: 4343d01c-0cd3-4575-9eea-cbb32831356b
